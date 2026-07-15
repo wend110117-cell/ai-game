@@ -35,27 +35,24 @@ def start_new_game():
     st.session_state.question_count = 0
     st.session_state.feedback = ""
     st.session_state.show_answer = False
-    st.session_state.answer = ""
-    next_question()
+    st.session_state.pending_new_question = True
 
 
 def next_question():
-    st.session_state.current_word = random.choice(WORDS)
-    st.session_state.answer = ""
+    st.session_state.pending_new_question = True
     st.session_state.feedback = ""
     st.session_state.show_answer = False
 
 
 def check_answer():
-    user_answer = st.session_state.answer.strip().lower()
+    user_answer = st.session_state.get("answer_input", "").strip().lower()
     correct_answer = st.session_state.current_word[1].lower()
 
     if user_answer == correct_answer:
         st.session_state.score += 1
         st.session_state.feedback = "정답입니다! 👏"
         st.session_state.question_count += 1
-        st.session_state.answer = ""
-        st.session_state.current_word = random.choice(WORDS)
+        st.session_state.pending_new_question = True
         st.session_state.show_answer = False
     else:
         st.session_state.feedback = f"아쉽네요. 정답은 {st.session_state.current_word[1]}입니다."
@@ -65,6 +62,13 @@ def check_answer():
 
 if "score" not in st.session_state:
     start_new_game()
+
+if st.session_state.get("pending_new_question", False):
+    st.session_state.pending_new_question = False
+    st.session_state.current_word = random.choice(WORDS)
+    st.session_state.answer_input = ""
+    st.session_state.feedback = ""
+    st.session_state.show_answer = False
 
 st.title("📚 중학생 영단어 게임")
 st.write("한국어 뜻을 보고 영어 단어를 맞혀 보세요. 한 번에 한 문제씩 재미있게 공부해 봅시다!")
@@ -79,7 +83,7 @@ st.subheader("문제")
 st.write(f"뜻: {st.session_state.current_word[0]}")
 
 with st.form("answer_form"):
-    answer = st.text_input("영어 단어를 입력하세요.", key="answer")
+    st.text_input("영어 단어를 입력하세요.", key="answer_input")
     submitted = st.form_submit_button("정답 확인")
 
 if submitted:
