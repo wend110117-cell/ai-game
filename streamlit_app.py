@@ -53,11 +53,14 @@ def check_answer():
     if user_answer == correct_answer:
         st.session_state.score += 1
         st.session_state.feedback = "정답입니다! 👏"
+        st.session_state.question_count += 1
+        st.session_state.answer = ""
+        st.session_state.current_word = random.choice(WORDS)
+        st.session_state.show_answer = False
     else:
         st.session_state.feedback = f"아쉽네요. 정답은 {st.session_state.current_word[1]}입니다."
-
-    st.session_state.show_answer = True
-    st.session_state.question_count += 1
+        st.session_state.show_answer = True
+        st.session_state.question_count += 1
 
 
 if "score" not in st.session_state:
